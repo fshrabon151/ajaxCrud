@@ -30,7 +30,6 @@
         <div class="col-lg-12">
           <a id="all" class="btn btn-primary btn-sm" href="">All Student</a>
           <a id="add_student" class="btn btn-primary btn-sm" href="">Add New Student</a>
-          <a id="profile" class="btn btn-primary btn-sm" href="">Profile</a>
         </div>
       </div>
     </div>
@@ -38,16 +37,6 @@
 
 
   <app></app>
-
-
-
-
-
-
-
-
-
-
 
   <!-- jQuery  -->
   <script src="assets/js/jquery-3.5.1.min.js"></script>
@@ -66,7 +55,8 @@
 
   <script>
     // showing data from create.php file 
-    $('#add_student').click(function() {
+    $('#add_student').click(function(e) {
+      e.preventDefault();
 
       $.ajax({
         url: 'create.php',
@@ -74,30 +64,49 @@
           $('app').html(data);
         }
       });
-
-      return false;
     });
 
     // showing data from all.php file 
-
-    $('#all').click(function() {
+    $('#all').click(function(e) {
+      e.preventDefault();
       tableData();
       allData();
-      return false;
+
     });
 
 
     // showing data from profile.php file 
 
-    $('#profile').click(function() {
+    $(document).on('click', '#profile', function(e) {
+      e.preventDefault();
+      let id = $(this).attr('profile_id');
       $.ajax({
         url: 'profile.php',
+        method: 'POST',
+        data: {
+          id: id
+        },
         success: function(data) {
           $('app').html(data);
         }
       });
 
-      return false;
+    });
+
+    // showing data from profile.php file 
+
+    $(document).on('click', '#back', function(e) {
+      e.preventDefault();
+      $.ajax({
+        url: 'all.php',
+        success: function(data) {
+          $('app').html(data);
+          allData();
+
+
+        }
+      });
+
     });
 
     // for showing table data 
@@ -115,13 +124,16 @@
 
     // taking data from form 
 
-    $(document).on('submit', '#student_form', function() {
+    $(document).on('submit', '#student_form', function(e) {
+      e.preventDefault();
+
       let name = $('#name').val();
       let email = $('#email').val();
       let cell = $('#cell').val();
       let username = $('#username').val();
+      let photo = $('#photo').val();
 
-      if (name == '' || email == '' || cell == '' || username == '') {
+      if (name == '' || email == '' || cell == '' || username == '' || photo == '') {
 
         swal({
           title: 'Opps',
@@ -135,25 +147,63 @@
 
           url: 'ajax_templete/create.php',
           method: 'POST',
-          data: {
-            name: name,
-            email: email,
-            cell: cell,
-            username: username
-          },
+          data: new FormData(this),
+          contentType: false,
+          processData: false,
           success: function(data) {
+            $('app').html(data);
+            tableData();
+            allData();
             swal('Done', 'Student added successful !', 'success');
-            $('#name').val('');
-            $('#email').val('');
-            $('#cell').val('');
-            $('#username').val('');
+            $('#student_form')[0].reset();
           }
 
 
 
         });
       }
-      return false;
+
+    });
+
+    $(document).on('submit', '#student_form_edit', function(e) {
+      e.preventDefault();
+
+      $.ajax({
+
+        url: 'ajax_templete/edit.php',
+        method: 'POST',
+        data: new FormData(this),
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          $('app').html(data);
+          tableData();
+          allData();
+          swal('Done', 'Data updated successful!', 'success');
+
+        }
+
+      });
+
+
+    });
+
+
+
+
+    $(document).on('click', '#edit', function(e) {
+      e.preventDefault();
+      let id = $(this).attr('edit_id');
+      $.ajax({
+        url: 'edit.php',
+        method: 'POST',
+        data: {
+          id: id
+        },
+        success: function(data) {
+          $('app').html(data);
+        }
+      });
     });
 
     // showing data from databse 
@@ -171,9 +221,12 @@
 
     // deleting data from database
 
-    $(document).on('click', 'a.delete-btn', function() {
+    $(document).on('click', 'a.delete-btn', function(e) {
+      e.preventDefault();
+
 
       let id = $(this).attr('delete_id');
+      let photo_id = $(this).attr('delete_photo_fileName');
 
       swal({
         title: 'Are you sure?',
@@ -189,7 +242,9 @@
             url: 'ajax_templete/delete.php',
             method: 'POST',
             data: {
-              id: id
+              id: id,
+              photo_id: photo_id
+
             },
             success: function(data) {
               swal({
@@ -212,7 +267,7 @@
         }
       });
 
-      return false;
+
 
     });
   </script>

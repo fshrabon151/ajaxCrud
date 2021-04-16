@@ -10,6 +10,7 @@
                     <th>Email</th>
                     <th>Cell</th>
                     <th>Adress</th>
+                    <th>Photo</th>
                     <th>Action</th>
                         
                     </tr>
